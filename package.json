@@ -1,0 +1,43 @@
+{
+  "name": "soa_order",
+  "version": "1.0.0",
+  "description": "nure soa project, order service ",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.7.0",
+    "http-errors": "^1.8.0",
+    "mysql2": "^2.2.5",
+    "nodemon": "^2.0.6",
+    "sequelize": "^6.3.5"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.2.0"
+  },
+  "scripts": {
+    "db:migrate": "sequelize db:migrate",
+    "db:seed:all": "sequelize db:seed:all",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon -e js,json index.js",
+    "start:manual": "sequelize db:drop && sequelize db:create && npm run db:migrate && npm run db:seed:all && npm start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/x0r3k/x0r3k-SOA_Autoshop_Order.git"
+  },
+  "keywords": [
+    "SOA",
+    "Order",
+    "Nure",
+    "Autoshop"
+  ],
+  "author": "KDolhopolov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/x0r3k/x0r3k-SOA_Autoshop_Order/issues"
+  },
+  "homepage": "https://github.com/x0r3k/x0r3k-SOA_Autoshop_Order#readme"
+}
