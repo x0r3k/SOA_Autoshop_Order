@@ -38,7 +38,7 @@ module.exports = (sequelize, DataType) => {
   });
 
   deliveriesTable.associate = (models) => {
-    deliveriesTable.hasMany(models.orders, 
+    deliveriesTable.belongsTo(models.orders, 
       { foreignKey: { name: 'fkOrderId', allowNull: false }, foreignKeyConstraint: true}
     );
   }

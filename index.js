@@ -5,7 +5,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const createError = require('http-errors');
 const { formErrorObject, errorHandling, MAIN_ERROR_CODES } = require('./src/services/errorHandling');
-// const productRouter = require('./src/api/routers/product.router');
+const orderRouter = require('./src/api/routers/order.router');
 // const categoryRouter = require('./src/api/routers/category.router');
 // const adminProductRouter = require('./src/api/routers/admin.product.router');
 // const adminCategoryRouter = require('./src/api/routers/admin.category.router');
@@ -20,7 +20,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use('/api/product', productRouter);
+app.use('/api/order', orderRouter);
 // app.use('/api/category', categoryRouter);
 // app.use('/api/admin/product', adminProductRouter);
 // app.use('/api/admin/category', adminCategoryRouter);
