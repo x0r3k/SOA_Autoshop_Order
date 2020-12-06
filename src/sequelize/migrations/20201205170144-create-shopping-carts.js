@@ -7,32 +7,27 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
       },
-      price: {
-        type: Sequelize.FLOAT(8,2),
-        allowNull: false,
-      },
-      discount: {
-        type: Sequelize.FLOAT(5,2),
-        allowNull: true,
-      },
       amount: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      fkOrderId: {
+      fkUserId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: {
-            tableName: 'orders',
-            key: 'id',
-          },
-        },
+        unique: 'fkProductId_fkUserId_unique',
       },
       fkProductId: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        unique: 'fkProductId_fkUserId_unique',
       }
+    },{
+      uniqueKeys: {
+        fkProductId_fkUserId_unique: {
+          customIndex: true,
+          fields: ['fkUserId', 'fkProductId'],
+        },
+      },
     });
   },
   down: async (queryInterface, Sequelize) => {

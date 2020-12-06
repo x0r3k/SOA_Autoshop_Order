@@ -5,21 +5,13 @@ module.exports = (sequelize, DataType) => {
       autoIncrement: true,
       primaryKey: true,
     },
-    price: {
-      type: DataType.FLOAT(8,2),
-      allowNull: false,
-    },
-    discount: {
-      type: DataType.FLOAT(5,2),
-      allowNull: true,
-    },
     amount: {
       type: DataType.INTEGER,
       allowNull: false,
     },
-    fkOrderId: {
+    fkUserId: {
       type: DataType.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     fkProductId: {
       type: DataType.INTEGER,
@@ -27,13 +19,13 @@ module.exports = (sequelize, DataType) => {
     }
   }, {
     freezeTableName: true,
+    indexes: [
+      {
+        unique: true,
+        fields: ['fkUserId', 'fkProductId'],
+      },
+    ],
   });
-
-  shoppingCartsTable.associate = (models) => {
-    shoppingCartsTable.belongsTo(models.orders, 
-      { foreignKey: { name: 'fkOrderId', allowNull: false }, foreignKeyConstraint: true}
-    );
-  }
 
   return shoppingCartsTable;
 };
