@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { addToCart, removeFromCart, changeProductCartAmount, createOrder } = require('../controllers/order.controller');
+const { getCartProductsList, addToCart, removeFromCart, changeProductCartAmount, createOrder } = require('../controllers/order.controller');
 const { authUser, authRole } = require('../../middlewares/auth.middleware');
 const {
     body_Product_Id,
@@ -22,6 +22,13 @@ const {
     body_Order_ReceiverFullname,
     body_Order_ReceiverMobile
 } = require('../../services/apiValidations');
+
+
+router.get(
+    '/getCartProductsList',
+    authUser,
+    getCartProductsList
+);
 
 
 router.post(

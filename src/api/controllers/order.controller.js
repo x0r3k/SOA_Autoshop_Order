@@ -8,6 +8,50 @@ const { changeProductAmount } = require('../../services/changeProductAmount');
 const { getCartProducts } = require('../../services/getCartProducts');
 
 module.exports = {
+
+    getCartProductsList: async (req, res, next) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+              return next(createError(formErrorObject(MAIN_ERROR_CODES.VALIDATION_BODY, 'Invalid request params', errors.errors)));
+            }
+            const user = req.user;
+
+            const cartProducts = await shopping_carts.findAll({ where: { fkUserId: user.userId } });
+
+            if(!cartProducts) {
+                await transaction.rollback();
+                return next(createError(formErrorObject(MAIN_ERROR_CODES.ELEMENT_NOT_FOUND, 'Shopping cart is empty')));
+            }
+            let productsList = await getCartProducts(cartProducts);
+
+            let result = productsList.map(item => {
+                let obj = {};
+                for(let i = 0; i < cartProducts.length; i++) {
+                    if(item.id === cartProducts[i].fkProductId) {
+                        obj.product = item;
+                        obj.userAmount = cartProducts[i].amount;
+                        break;
+                    }
+                }
+                return obj;
+            });
+            return res.status(200).json({result});
+        } catch (error) {
+            console.log(error);
+            if(error.response && error.response.code && error.response.message) {
+                return next(createError(formErrorObject(
+                {
+                    ERROR_CODE: error.response.code, 
+                    HTTP_CODE: error.status || 400, 
+                    MESSAGE: error.response.message 
+                }, null, error.response.details || null)));
+            }
+            return next(createError(formErrorObject(MAIN_ERROR_CODES.SYSTEM_ERROR, 'Something went wrong, please try again1')));
+        }
+    },
+
+
     addToCart: async (req, res, next) => {
       try {
         const errors = validationResult(req);
