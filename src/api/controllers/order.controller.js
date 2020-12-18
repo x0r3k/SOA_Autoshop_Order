@@ -3,7 +3,6 @@ const { shopping_carts, orders, order_carts, deliveries, transactions, sequelize
 const { validationResult } = require('express-validator');
 const {formErrorObject, MAIN_ERROR_CODES} = require('../../services/errorHandling');
 const Op = Sequelize.Op;
-const { getProduct } = require('../../services/getProduct');
 const { changeProductAmount } = require('../../services/changeProductAmount');
 const { getCartProducts } = require('../../services/getCartProducts');
 
@@ -24,7 +23,7 @@ module.exports = {
                 return next(createError(formErrorObject(MAIN_ERROR_CODES.ELEMENT_NOT_FOUND, 'Shopping cart is empty')));
             }
             let productsList = await getCartProducts(cartProducts);
-
+            console.log("RESULT", productsList);
             let result = productsList.map(item => {
                 let obj = {};
                 for(let i = 0; i < cartProducts.length; i++) {
@@ -36,6 +35,7 @@ module.exports = {
                 }
                 return obj;
             });
+
             return res.status(200).json({result});
         } catch (error) {
             console.log(error);
