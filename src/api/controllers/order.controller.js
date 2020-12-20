@@ -5,6 +5,7 @@ const {formErrorObject, MAIN_ERROR_CODES} = require('../../services/errorHandlin
 const Op = Sequelize.Op;
 const { changeProductAmount } = require('../../services/changeProductAmount');
 const { getCartProducts } = require('../../services/getCartProducts');
+const axios = require('axios');
 
 module.exports = {
 
@@ -53,6 +54,7 @@ module.exports = {
 
 
     addToCart: async (req, res, next) => {
+        // console.log("TEXT\n\n");
       try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -60,26 +62,30 @@ module.exports = {
         }
         const user = req.user;
         const { productId, amount } = req.body;
-        let product;
 
+        const foundedProduct = await shopping_carts.findOne({
+            where: {
+                fkUserId: user.userId,
+                fkProductId: productId
+            }
+        });
+        if(foundedProduct) return next(createError(formErrorObject(MAIN_ERROR_CODES.ELEMENT_ALREADY_DONE, 'Element already in shopping cart')));
+
+        let product;
+        // console.log(productId, amount);
         try {
-            product = await getProduct(productId);
+            product = await axios.get(`http://localhost:${process.env.PRODUCT_HTTP_PORT}/api/product/getProductById/${productId}`);
+            product = product.data.product;
         } catch (error) {
+            console.log("ERROR\n", error);
             if(error.response && error.response.data && error.response.data.code && error.response.data.message) {
                 return next(createError(formErrorObject({ERROR_CODE: error.response.data.code, HTTP_CODE: error.response.status, MESSAGE: error.response.data.message })));
             }
             return next(createError(formErrorObject(MAIN_ERROR_CODES.SYSTEM_ERROR, 'Something went wrong, please try again')));
         }
+        console.log(product);
 
         if(product.amount < amount) return next(createError(formErrorObject(MAIN_ERROR_CODES.ELEMENT_ALREADY_DONE, 'No such amount of product')));
-        
-        const foundedProduct = await shopping_carts.findOne({
-            where: {
-                fkUserId: user.userId,
-                fkProductId: product.id
-            }
-        });
-        if(foundedProduct) return next(createError(formErrorObject(MAIN_ERROR_CODES.ELEMENT_ALREADY_DONE, 'Element already in shopping cart')));
 
         await shopping_carts.create({
             amount,
@@ -101,24 +107,27 @@ module.exports = {
             return next(createError(formErrorObject(MAIN_ERROR_CODES.VALIDATION_BODY, 'Invalid request params', errors.errors)));
           }
           const user = req.user;
-          const { productId } = req.body;
-          let product;
+          const { productId } = req.query;
+        //   let product;
   
-          try {
-              product = await getProduct(productId);
-          } catch (error) {
-              if(error.response && error.response.data && error.response.data.code && error.response.data.message) {
-                  return next(createError(formErrorObject({ERROR_CODE: error.response.data.code, HTTP_CODE: error.response.status, MESSAGE: error.response.data.message })));
-              }
-              return next(createError(formErrorObject(MAIN_ERROR_CODES.SYSTEM_ERROR, 'Something went wrong, please try again')));
-          }
+            // try {
+            //     product = await axios.get(`http://localhost:${process.env.PRODUCT_HTTP_PORT}/api/product/getProductById/${productId}`);
+            //     product = product.data.product;
+            // } catch (error) {
+            //     console.log("ERROR\n", error);
+            //     if(error.response && error.response.data && error.response.data.code && error.response.data.message) {
+            //         return next(createError(formErrorObject({ERROR_CODE: error.response.data.code, HTTP_CODE: error.response.status, MESSAGE: error.response.data.message })));
+            //     }
+            //     return next(createError(formErrorObject(MAIN_ERROR_CODES.SYSTEM_ERROR, 'Something went wrong, please try again')));
+            // }
   
           const foundedProduct = await shopping_carts.findOne({
               where: {
                   fkUserId: user.userId,
-                  fkProductId: product.id
+                  fkProductId: productId
               }
           });
+
           if(!foundedProduct) return next(createError(formErrorObject(MAIN_ERROR_CODES.ELEMENT_NOT_FOUND, 'Product not found in shopping cart')));
   
           await foundedProduct.destroy();
